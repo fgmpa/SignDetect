@@ -5,10 +5,32 @@
     android:layout_height="match_parent"
     tools:context=".presentation.ui.CameraFragment">
 
+
     <!-- TODO: Update blank fragment layout -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    <ImageButton
+        android:id="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:background="@null"
+        android:paddingTop="10dp"
+        android:paddingStart="10dp"
+        android:src="@drawable/exit"
+        />
+    <ImageButton
+        android:id="@+id/history_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@null"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingStart="10dp"
+        android:src="@drawable/history"
+        />
 
 </FrameLayout>

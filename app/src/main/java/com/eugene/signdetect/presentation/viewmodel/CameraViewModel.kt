@@ -19,15 +19,20 @@ class CameraViewModel @Inject constructor(
     private val _detectionResult = MutableLiveData<List<DetectionResult>>()
     val detectionResult: LiveData<List<DetectionResult>> = _detectionResult
 
-    fun detect(imageBytes: ByteArray) {
+    fun detect(imageBytes: ByteArray, token: String) {
         viewModelScope.launch {
             try {
-                Log.d("NetworkDebug", "Detect")
-                val results = detectSignUseCase(imageBytes)
+                if (token.isBlank()) {
+                    Log.e("NetworkDebug", "No token provided")
+                    return@launch
+                }
+                Log.d("NetworkDebug", "Detecting with token")
+                val results = detectSignUseCase(imageBytes, token)
                 _detectionResult.postValue(results)
             } catch (e: Exception) {
-                // логируем или обрабатываем ошибку
+                Log.e("NetworkDebug", "Detection error", e)
             }
         }
     }
+
 }

@@ -20,6 +20,7 @@ class NoticeFragment(private val message: String) : DialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
     }
 
     override fun onCreateView(
@@ -34,7 +35,7 @@ class NoticeFragment(private val message: String) : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
-            delay(3000)
+            delay(2400)
             dismiss()
         }
     }

@@ -1,7 +1,9 @@
 package com.eugene.signdetect.di
 
 import com.eugene.signdetect.data.api.DetectionApiService
+import com.eugene.signdetect.data.repository.AuthRepositoryImpl
 import com.eugene.signdetect.data.repository.DetectionRepositoryImpl
+import com.eugene.signdetect.domain.repository.AuthRepository
 import com.eugene.signdetect.domain.repository.DetectionRepository
 import com.eugene.signdetect.domain.usecases.DetectSignUseCase
 import dagger.Module
@@ -20,6 +22,11 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
+    fun provideAuthRepository(api: DetectionApiService): AuthRepository {
+        return AuthRepositoryImpl(api)
+    }
+    @Provides
+    @Singleton
     fun provideOkHttpClient(): OkHttpClient {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.HEADERS
@@ -34,7 +41,7 @@ object AppModule {
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .client(client)
-            .baseUrl("  https://fgmpa.loca.lt/")
+            .baseUrl("https://fgmpa.loca.lt/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

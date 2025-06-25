@@ -16,11 +16,16 @@ import com.eugene.signdetect.presentation.viewmodel.CameraViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.Executors
 import android.Manifest
+import android.content.Context
 import android.media.SoundPool
+import android.widget.ImageButton
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.eugene.signdetect.R
 import com.eugene.signdetect.databinding.FragmentCameraBinding
 import com.eugene.signdetect.presentation.util.SignName
+import com.eugene.signdetect.presentation.viewmodel.AuthViewModel
 
 
 @AndroidEntryPoint
@@ -54,19 +59,30 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             requestCameraPermission()
         }
         startCamera()
-
-        var lastSign = ""
+        var logoutButton = view.findViewById<ImageButton>(R.id.logout)
+        logoutButton.setOnClickListener {
+            findNavController().navigate(R.id.action_camFragment_to_logFragment)
+        }
+        var toHistoryButton = view.findViewById<ImageButton>(R.id.history_button)
+        toHistoryButton.setOnClickListener {
+            findNavController().navigate(R.id.action_cameraFragment_to_historyFragment)
+        }
+        var lastNotificationTime = 0L
+        val notificationIntervalMs = 2500L
         soundId = sp.load(requireContext(), R.raw.sound1, 1)
         viewModel.detectionResult.observe(viewLifecycleOwner) { results ->
-            results.forEach {
-                if (SignName.getName(it.label)!=lastSign) {
-                    sp.play(soundId, 1f, 1f, 0, 0, 1f)
-                    NoticeFragment(SignName.getName(it.label)).show(parentFragmentManager, "dialog")
-                    lastSign = SignName.getName(it.label).toString()
-                }
+            val listString = results.map { SignName.getName(it.label) }.distinct()
+            val currentTime = System.currentTimeMillis()
+
+            if (listString.isNotEmpty() && currentTime - lastNotificationTime >= notificationIntervalMs) {
+                lastNotificationTime = currentTime
+                sp.play(soundId, 1f, 1f, 0, 0, 1f)
+                NoticeFragment(listString.joinToString(separator = "\n  \n")).show(
+                    parentFragmentManager,
+                    "dialog"
+                )
             }
         }
-
 
     }
 
@@ -104,7 +120,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, FrameAnalyzer(requireContext()) { bytes ->
-                        viewModel.detect(bytes)
+                        val prefs = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                        val token = prefs.getString("token", "") ?: ""
+                        viewModel.detect(bytes,token)
                     })
                 }
 
